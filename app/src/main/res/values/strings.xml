@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">MOBV Zadanie</string>
+    <string name="title_login">Login</string>
+    <string name="title_intro">Intro</string>
+    <string name="title_signup">Registration</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoieGhhbmNha3MiLCJhIjoiY2wybGt5ZzhoMG9mNTNjcGt5cW5vbDd2ZiJ9.kbctbyxA8_OgWl9eer1fpw</string>
+
+    <string name="email">Email:</string>
+    <string name="zadajte_email">Insert email</string>
+    <string name="username">Username:</string>
+    <string name="zadajte_username">Insert username</string>
+    <string name="heslo">Password</string>
+    <string name="zadajte_heslo">Insert password</string>
+    <string name="zopakujte_heslo">Repeat password</string>
+    <string name="registruj_sa">Register</string>
+    <string name="prihlasit_sa">Login</string>
+    <string name="profile">Profile</string>
+    <string name="nacitaj_profil">Load profile</string>
+    <string name="odhlasit_sa">Log out</string>
+</resources>
