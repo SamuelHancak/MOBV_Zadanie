@@ -11,6 +11,7 @@ import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
 import eu.mcomputing.mobv.mobvzadanie.data.model.User
 import venaka.bioapp.data.db.LocalCache
 import java.io.IOException
+import java.security.MessageDigest
 
 class DataRepository private constructor(
     private val service: ApiService,
@@ -31,12 +32,20 @@ class DataRepository private constructor(
                         LocalCache(AppRoomDatabase.getInstance(context).appDao())
                     ).also { INSTANCE = it }
             }
+
+        fun hashPassword(plainPassword: String): String {
+            val bytes = plainPassword.toByteArray()
+            val digest = MessageDigest.getInstance("SHA-256")
+            val hashedBytes = digest.digest(bytes)
+            return hashedBytes.joinToString("") { "%02x".format(it) }
+        }
     }
 
     suspend fun apiRegisterUser(
         username: String,
         email: String,
-        password: String
+        password: String,
+        repeatPassword: String
     ): Pair<String, User?> {
         if (username.isEmpty()) {
             return Pair("Username can not be empty", null)
@@ -47,20 +56,44 @@ class DataRepository private constructor(
         if (password.isEmpty()) {
             return Pair("Password can not be empty", null)
         }
+        if (repeatPassword.isEmpty()) {
+            return Pair("Repeat the password please", null)
+        }
+        if (password != repeatPassword) {
+            return Pair("Passwords do not match", null)
+        }
         try {
-            val response = service.registerUser(UserRegistrationRequest(username, email, password))
+            val response = service.registerUser(
+                UserRegistrationRequest(
+                    username,
+                    email,
+                    hashPassword(password)
+                )
+            )
             if (response.isSuccessful) {
-                response.body()?.let { json_response ->
-                    return Pair(
-                        "",
-                        User(
-                            username,
-                            email,
-                            json_response.uid,
-                            json_response.access,
-                            json_response.refresh
-                        )
-                    )
+                response.body()?.let { jsonResponse ->
+                    when (jsonResponse.uid) {
+                        "-1" -> {
+                            return Pair("Username is already registered.", null)
+                        }
+
+                        "-2" -> {
+                            return Pair("Email is already registered.", null)
+                        }
+
+                        else -> {
+                            return Pair(
+                                "",
+                                User(
+                                    username,
+                                    email,
+                                    jsonResponse.uid,
+                                    jsonResponse.access,
+                                    jsonResponse.refresh
+                                )
+                            )
+                        }
+                    }
                 }
             }
             return Pair("Failed to create user", null)
@@ -84,10 +117,15 @@ class DataRepository private constructor(
             return Pair("Password can not be empty", null)
         }
         try {
-            val response = service.loginUser(UserLoginRequest(username, password))
+            val response = service.loginUser(
+                UserLoginRequest(
+                    username,
+                    hashPassword(password)
+                )
+            )
             if (response.isSuccessful) {
-                response.body()?.let { json_response ->
-                    if (json_response.uid == "-1") {
+                response.body()?.let { jsonResponse ->
+                    if (jsonResponse.uid == "-1") {
                         return Pair("Wrong password or username.", null)
                     }
                     return Pair(
@@ -95,9 +133,9 @@ class DataRepository private constructor(
                         User(
                             username,
                             "",
-                            json_response.uid,
-                            json_response.access,
-                            json_response.refresh
+                            jsonResponse.uid,
+                            jsonResponse.access,
+                            jsonResponse.refresh
                         )
                     )
                 }

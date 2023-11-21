@@ -17,8 +17,8 @@
             app:destination="@id/signupFragment" />
         <action
             android:id="@+id/action_intro_feed"
-            app:popUpToInclusive="true"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -27,8 +27,8 @@
         android:label="LoginFragment">
         <action
             android:id="@+id/action_login_feed"
-            app:popUpToInclusive="true"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -37,8 +37,8 @@
         android:label="SignupFragment">
         <action
             android:id="@+id/action_signup_feed"
-            app:popUpToInclusive="true"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -54,14 +54,8 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.ProfileFragment"
-        android:label="ProfileFragment">
-        <action
-            android:id="@+id/action_profile_intro"
-            app:popUpToInclusive="true"
-            app:destination="@id/introFragment" />
-    </fragment>
-
-
+        android:label="ProfileFragment" />
+    
     <action
         android:id="@+id/action_to_feed"
         app:destination="@id/feedFragment" />
@@ -73,4 +67,9 @@
     <action
         android:id="@+id/action_to_profile"
         app:destination="@id/profileFragment" />
+
+    <action
+        android:id="@+id/action_to_intro"
+        app:destination="@id/introFragment"
+        app:popUpToInclusive="true" />
 </navigation>

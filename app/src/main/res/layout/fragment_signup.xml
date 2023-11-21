@@ -18,12 +18,11 @@
             android:id="@+id/header_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="80dp"
             android:text="@string/title_signup"
             android:textAlignment="center"
-            android:textSize="20sp"
+            android:textFontWeight="600"
+            android:textSize="40sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -34,15 +33,22 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:text="@string/email"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header_title" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.4" />
 
         <EditText
             android:id="@+id/edit_text_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:autofillHints="emailAddress"
             android:hint="@string/zadajte_email"
+            android:inputType="textEmailAddress"
             android:text="@={model.email}"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_email" />
@@ -51,8 +57,8 @@
             android:id="@+id/label_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:text="@string/username"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_text_email" />
 
@@ -60,8 +66,11 @@
             android:id="@+id/edit_text_username"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:autofillHints="username"
             android:hint="@string/zadajte_username"
+            android:inputType="text"
             android:text="@={model.username}"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_username" />
@@ -71,6 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/heslo"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_text_username" />
 
@@ -78,8 +88,11 @@
             android:id="@+id/edit_text_password"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:autofillHints="password"
             android:hint="@string/zadajte_heslo"
+            android:inputType="textPassword"
             android:text="@={model.password}"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_password" />
@@ -89,6 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/zopakujte_heslo"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_text_password" />
 
@@ -96,8 +110,11 @@
             android:id="@+id/edit_text_password_repeat"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:autofillHints="password"
             android:hint="@string/zopakujte_heslo"
-            android:text="@={model.repeat_password}"
+            android:inputType="textPassword"
+            android:text="@={model.repeatPassword}"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_password_repeat" />
@@ -109,9 +126,19 @@
             android:onClick="@{()->model.registerUser()}"
             android:text="@string/registruj_sa"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/back_btn"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/submit_button" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

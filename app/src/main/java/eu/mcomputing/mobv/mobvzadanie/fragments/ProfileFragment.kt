@@ -117,7 +117,7 @@ class ProfileFragment : Fragment() {
 
             bnd.logoutBtn.setOnClickListener {
                 PreferenceData.getInstance().clearData(requireContext())
-                it.findNavController().navigate(R.id.action_profile_intro)
+                it.findNavController().navigate(R.id.action_to_intro)
             }
 
             viewModel.profileResult.observe(viewLifecycleOwner) {

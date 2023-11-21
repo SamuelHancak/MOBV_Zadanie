@@ -16,7 +16,6 @@ import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
     exportSchema = false
 )
 abstract class AppRoomDatabase : RoomDatabase() {
-
     abstract fun appDao(): DbDao
 
     companion object {

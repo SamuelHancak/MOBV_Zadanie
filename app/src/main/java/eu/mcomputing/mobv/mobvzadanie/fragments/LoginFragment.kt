@@ -58,8 +58,14 @@ class LoginFragment : Fragment() {
             viewModel.userResult.observe(viewLifecycleOwner) {
                 it?.let { user ->
                     PreferenceData.getInstance().putUser(requireContext(), user)
-                    requireView().findNavController().navigate(R.id.action_login_feed)
+                    requireView().findNavController().navigate(R.id.action_to_map)
                 } ?: PreferenceData.getInstance().putUser(requireContext(), null)
+            }
+
+            bnd.backBtn.apply {
+                setOnClickListener {
+                    it.findNavController().navigate(R.id.action_to_intro)
+                }
             }
 
         }
