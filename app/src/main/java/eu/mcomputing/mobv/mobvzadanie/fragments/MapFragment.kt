@@ -21,6 +21,7 @@ import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
@@ -35,6 +36,8 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import eu.mcomputing.mobv.mobvzadanie.R
+import eu.mcomputing.mobv.mobvzadanie.data.DataRepository
+import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentMapBinding
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
 import java.util.Random
@@ -48,10 +51,11 @@ class MapFragment : Fragment() {
     private var lastLocation: Point? = null
     private lateinit var annotationManager: CircleAnnotationManager
     private lateinit var annotationImgManager: PointAnnotationManager
+    private var users: List<UserEntity>? = null
 
     private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
-    val requestPermissionLauncher =
+    private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -61,7 +65,7 @@ class MapFragment : Fragment() {
             }
         }
 
-    fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
+    private fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -80,6 +84,9 @@ class MapFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
         }.also { bnd ->
             bnd.bottomBar.setActive(BottomBar.MAP)
+            DataRepository.getInstance(requireContext()).getUsers().observe(viewLifecycleOwner) {
+                users = it
+            }
 
             annotationManager = bnd.mapView.annotations.createCircleAnnotationManager()
             annotationImgManager = bnd.mapView.annotations.createPointAnnotationManager()
@@ -131,9 +138,8 @@ class MapFragment : Fragment() {
                 .build()
         )
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS,
-
-            ) {
+            Style.MAPBOX_STREETS
+        ) {
             if (enabled) {
                 initLocationComponent()
                 addLocationListeners()
@@ -153,9 +159,18 @@ class MapFragment : Fragment() {
         val locationComponentPlugin = binding.mapView.location
         locationComponentPlugin.updateSettings {
             this.enabled = true
-            this.pulsingEnabled = true
-        }
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.baseline_account_box_24,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.baseline_account_box_24,
+                ),
+            )
 
+        }
     }
 
     private fun addLocationListeners() {
@@ -163,7 +178,6 @@ class MapFragment : Fragment() {
             onIndicatorPositionChangedListener
         )
         binding.mapView.gestures.addOnMoveListener(onMoveListener)
-
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
@@ -179,10 +193,10 @@ class MapFragment : Fragment() {
         addMarker(point)
     }
 
-    private fun generateRandomPoint(centerPoint: Point, maxDistance: Double): Point {
+    private fun generateRandomPoint(centerPoint: Point): Point {
         val random = Random()
         val angle = random.nextDouble() * 2 * Math.PI
-        val distance = random.nextDouble() * maxDistance
+        val distance = random.nextDouble() * 0.003
 
         val deltaX = distance * cos(angle)
         val deltaY = distance * sin(angle)
@@ -207,31 +221,25 @@ class MapFragment : Fragment() {
                 .withCircleColor("#000")
                 .withCircleStrokeWidth(2.0)
                 .withCircleStrokeColor("#ffffff")
-            val imgAnnotationOptions = PointAnnotationOptions()
-                .withPoint(point)
-                .withIconSize(1.5)
-            bitmapFromDrawableRes(
-                requireContext(),
-                R.drawable.baseline_account_box_24
-            )?.let {
-                imgAnnotationOptions.withIconImage(it)
-            }
 
             selectedPoint = annotationManager.create(pointAnnotationOptions)
-            annotationImgManager.create(imgAnnotationOptions)
 
-            for (i in 0 until 10) {
-                val randomPoint = generateRandomPoint(point, 0.003) // Adjust radius as needed
-                val imgAnnotationOptions2 = PointAnnotationOptions()
-                    .withPoint(randomPoint)
-                    .withIconSize(1.5)
-                bitmapFromDrawableRes(
-                    requireContext(),
-                    R.drawable.baseline_account_box_24
-                )?.let {
-                    imgAnnotationOptions2.withIconImage(it)
+            if (users != null) {
+                val randomUserAnnotations = mutableListOf<PointAnnotationOptions>()
+                for (user in users!!) {
+                    val randomPoint = generateRandomPoint(point)
+                    val imgAnnotationOptions2 = PointAnnotationOptions()
+                        .withPoint(randomPoint)
+                        .withIconSize(1.5)
+                    bitmapFromDrawableRes(
+                        requireContext(),
+                        R.drawable.baseline_account_box_24
+                    )?.let {
+                        imgAnnotationOptions2.withIconImage(it)
+                    }
+                    randomUserAnnotations.add(imgAnnotationOptions2)
                 }
-                annotationImgManager.create(imgAnnotationOptions2)
+                annotationImgManager.create(randomUserAnnotations)
             }
         } else {
             selectedPoint?.let {
