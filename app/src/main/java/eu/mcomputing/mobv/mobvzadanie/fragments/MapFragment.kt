@@ -3,11 +3,18 @@ package eu.mcomputing.mobv.mobvzadanie.fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.gestures.MoveGestureDetector
@@ -18,14 +25,21 @@ import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createCircleAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import eu.mcomputing.mobv.mobvzadanie.R
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentMapBinding
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
+import java.util.Random
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class MapFragment : Fragment() {
@@ -33,6 +47,7 @@ class MapFragment : Fragment() {
     private var selectedPoint: CircleAnnotation? = null
     private var lastLocation: Point? = null
     private lateinit var annotationManager: CircleAnnotationManager
+    private lateinit var annotationImgManager: PointAnnotationManager
 
     private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -67,6 +82,7 @@ class MapFragment : Fragment() {
             bnd.bottomBar.setActive(BottomBar.MAP)
 
             annotationManager = bnd.mapView.annotations.createCircleAnnotationManager()
+            annotationImgManager = bnd.mapView.annotations.createPointAnnotationManager()
 
             val hasPermission = hasPermissions(requireContext())
             onMapReady(hasPermission)
@@ -84,6 +100,29 @@ class MapFragment : Fragment() {
         }
     }
 
+    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
+        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
+
+    private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap? {
+        if (sourceDrawable == null) {
+            return null
+        }
+        return if (sourceDrawable is BitmapDrawable) {
+            sourceDrawable.bitmap
+        } else {
+            val constantState = sourceDrawable.constantState ?: return null
+            val drawable = constantState.newDrawable().mutate()
+            val bitmap: Bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth, drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        }
+    }
+
     private fun onMapReady(enabled: Boolean) {
         binding.mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()
@@ -92,8 +131,9 @@ class MapFragment : Fragment() {
                 .build()
         )
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS
-        ) {
+            Style.MAPBOX_STREETS,
+
+            ) {
             if (enabled) {
                 initLocationComponent()
                 addLocationListeners()
@@ -139,18 +179,60 @@ class MapFragment : Fragment() {
         addMarker(point)
     }
 
+    private fun generateRandomPoint(centerPoint: Point, maxDistance: Double): Point {
+        val random = Random()
+        val angle = random.nextDouble() * 2 * Math.PI
+        val distance = random.nextDouble() * maxDistance
+
+        val deltaX = distance * cos(angle)
+        val deltaY = distance * sin(angle)
+
+        val point =
+            Point.fromLngLat(centerPoint.longitude() + deltaX, centerPoint.latitude() + deltaY, 0.0)
+        Log.d("point - generated", point.toString())
+        Log.d("point - center", centerPoint.toString())
+
+        return point
+    }
 
     private fun addMarker(point: Point) {
+        val circleRadius = 100.0
+
         if (selectedPoint == null) {
             annotationManager.deleteAll()
             val pointAnnotationOptions = CircleAnnotationOptions()
                 .withPoint(point)
-                .withCircleRadius(100.0)
+                .withCircleRadius(circleRadius)
                 .withCircleOpacity(0.2)
                 .withCircleColor("#000")
                 .withCircleStrokeWidth(2.0)
                 .withCircleStrokeColor("#ffffff")
+            val imgAnnotationOptions = PointAnnotationOptions()
+                .withPoint(point)
+                .withIconSize(1.5)
+            bitmapFromDrawableRes(
+                requireContext(),
+                R.drawable.baseline_account_box_24
+            )?.let {
+                imgAnnotationOptions.withIconImage(it)
+            }
+
             selectedPoint = annotationManager.create(pointAnnotationOptions)
+            annotationImgManager.create(imgAnnotationOptions)
+
+            for (i in 0 until 10) {
+                val randomPoint = generateRandomPoint(point, 0.003) // Adjust radius as needed
+                val imgAnnotationOptions2 = PointAnnotationOptions()
+                    .withPoint(randomPoint)
+                    .withIconSize(1.5)
+                bitmapFromDrawableRes(
+                    requireContext(),
+                    R.drawable.baseline_account_box_24
+                )?.let {
+                    imgAnnotationOptions2.withIconImage(it)
+                }
+                annotationImgManager.create(imgAnnotationOptions2)
+            }
         } else {
             selectedPoint?.let {
                 it.point = point
@@ -158,7 +240,6 @@ class MapFragment : Fragment() {
             }
         }
     }
-
 
     private val onMoveListener = object : OnMoveListener {
         override fun onMoveBegin(detector: MoveGestureDetector) {
