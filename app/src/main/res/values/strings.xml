@@ -20,4 +20,10 @@
     <string name="odhlasit_sa">Log out</string>
     <string name="share_location">Share my location</string>
     <string name="back">Back</string>
+    <string name="profile_user_pic">User\'s picture</string>
+    <string name="map_icon_desc">Map icon</string>
+    <string name="feed_icon_desc">Feed icon</string>
+    <string name="profile_icon_desc">Profile icon</string>
+    <string name="share_location_time_limited">Share my location (10am - 17pm)</string>
+    <string name="change_password">Change password</string>
 </resources>

@@ -1,6 +1,7 @@
 package eu.mcomputing.mobv.mobvzadanie.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import eu.mcomputing.mobv.mobvzadanie.adapters.FeedAdapter
 import eu.mcomputing.mobv.mobvzadanie.data.DataRepository
+import eu.mcomputing.mobv.mobvzadanie.data.PreferenceData
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentFeedBinding
 import eu.mcomputing.mobv.mobvzadanie.viewmodels.FeedViewModel
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
@@ -33,6 +35,7 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentFeedBinding.inflate(inflater, container, false)
+        Log.d("FeedFragment", PreferenceData.getInstance().getSharing(requireContext()).toString())
         return binding.root
     }
 
@@ -57,6 +60,7 @@ class FeedFragment : Fragment() {
             bnd.pullRefresh.setOnRefreshListener {
                 viewModel.updateItems()
             }
+
             viewModel.loading.observe(viewLifecycleOwner) {
                 bnd.pullRefresh.isRefreshing = it
             }

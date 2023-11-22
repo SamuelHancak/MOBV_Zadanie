@@ -47,6 +47,11 @@
         android:label="FeedFragment" />
 
     <fragment
+        android:id="@+id/feedLocationFragment"
+        android:name="eu.mcomputing.mobv.mobvzadanie.fragments.FeedLocationFragment"
+        android:label="FeedLocationFragment" />
+
+    <fragment
         android:id="@+id/mapFragment"
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.MapFragment"
         android:label="MapFragment" />
@@ -55,7 +60,8 @@
         android:id="@+id/profileFragment"
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.ProfileFragment"
         android:label="ProfileFragment" />
-    
+
+
     <action
         android:id="@+id/action_to_feed"
         app:destination="@id/feedFragment" />
@@ -67,6 +73,10 @@
     <action
         android:id="@+id/action_to_profile"
         app:destination="@id/profileFragment" />
+
+    <action
+        android:id="@+id/action_to_feed_location"
+        app:destination="@id/feedLocationFragment" />
 
     <action
         android:id="@+id/action_to_intro"

@@ -31,7 +31,11 @@ class IntroFragment : Fragment(R.layout.fragment_intro) {
 
         val user = PreferenceData.getInstance().getUser(requireContext())
         if (user != null) {
-            requireView().findNavController().navigate(R.id.action_intro_feed)
+            if (PreferenceData.getInstance().getSharing(requireContext())) {
+                requireView().findNavController().navigate(R.id.action_to_map)
+            } else {
+                requireView().findNavController().navigate(R.id.action_to_feed_location)
+            }
         }
     }
 

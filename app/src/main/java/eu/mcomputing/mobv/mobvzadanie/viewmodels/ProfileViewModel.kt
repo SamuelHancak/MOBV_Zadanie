@@ -10,8 +10,8 @@ import eu.mcomputing.mobv.mobvzadanie.data.model.User
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(private val dataRepository: DataRepository) : ViewModel() {
-    private val _profileResult = MutableLiveData<String>()
-    val profileResult: LiveData<String> get() = _profileResult
+    private val _profileResult = MutableLiveData<String?>()
+    val profileResult: LiveData<String?> get() = _profileResult
 
     private val _userResult = MutableLiveData<User?>()
     val userResult: LiveData<User?> get() = _userResult

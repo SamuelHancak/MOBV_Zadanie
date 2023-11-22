@@ -2,11 +2,14 @@ package eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
 import eu.mcomputing.mobv.mobvzadanie.R
+import eu.mcomputing.mobv.mobvzadanie.data.PreferenceData
+
 
 class BottomBar : ConstraintLayout {
     private var active = -1
@@ -31,12 +34,21 @@ class BottomBar : ConstraintLayout {
 
         layout.findViewById<ImageView>(R.id.map).setOnClickListener {
             if (active != MAP) {
-                it.findNavController().navigate(R.id.action_to_map)
+                Log.d("BottomBar", PreferenceData.getInstance().getSharing(context).toString())
+                if (PreferenceData.getInstance().getSharing(context)) {
+                    it.findNavController().navigate(R.id.action_to_map)
+                } else {
+                    it.findNavController().navigate(R.id.action_to_feed_location)
+                }
             }
         }
         layout.findViewById<ImageView>(R.id.feed).setOnClickListener {
             if (active != FEED) {
-                it.findNavController().navigate(R.id.action_to_feed)
+                if (PreferenceData.getInstance().getSharing(context)) {
+                    it.findNavController().navigate(R.id.action_to_feed)
+                } else {
+                    it.findNavController().navigate(R.id.action_to_feed_location)
+                }
             }
         }
         layout.findViewById<ImageView>(R.id.profile).setOnClickListener {

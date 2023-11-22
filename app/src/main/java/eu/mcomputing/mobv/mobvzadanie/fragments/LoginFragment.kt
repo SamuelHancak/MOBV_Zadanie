@@ -58,7 +58,11 @@ class LoginFragment : Fragment() {
             viewModel.userResult.observe(viewLifecycleOwner) {
                 it?.let { user ->
                     PreferenceData.getInstance().putUser(requireContext(), user)
-                    requireView().findNavController().navigate(R.id.action_to_map)
+                    if (PreferenceData.getInstance().getSharing(requireContext())) {
+                        requireView().findNavController().navigate(R.id.action_to_map)
+                    } else {
+                        requireView().findNavController().navigate(R.id.action_to_feed_location)
+                    }
                 } ?: PreferenceData.getInstance().putUser(requireContext(), null)
             }
 

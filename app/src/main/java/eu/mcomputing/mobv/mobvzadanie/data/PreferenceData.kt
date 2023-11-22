@@ -6,7 +6,6 @@ import eu.mcomputing.mobv.mobvzadanie.config.AppConfig
 import eu.mcomputing.mobv.mobvzadanie.data.model.User
 
 class PreferenceData private constructor() {
-
     private fun getSharedPreferences(context: Context?): SharedPreferences? {
         return context?.getSharedPreferences(
             shpKey, Context.MODE_PRIVATE
@@ -37,6 +36,19 @@ class PreferenceData private constructor() {
         return User.fromJson(json)
     }
 
+    fun putTimeSharing(context: Context?, sharing: Boolean) {
+        val sharedPref = getSharedPreferences(context) ?: return
+        val editor = sharedPref.edit()
+        editor.putBoolean(sharingTimeKey, sharing)
+        editor.apply()
+    }
+
+    fun getTimeSharing(context: Context?): Boolean {
+        val sharedPref = getSharedPreferences(context) ?: return false
+
+        return sharedPref.getBoolean(sharingTimeKey, false)
+    }
+
     fun putSharing(context: Context?, sharing: Boolean) {
         val sharedPref = getSharedPreferences(context) ?: return
         val editor = sharedPref.edit()
@@ -46,9 +58,8 @@ class PreferenceData private constructor() {
 
     fun getSharing(context: Context?): Boolean {
         val sharedPref = getSharedPreferences(context) ?: return false
-        val sharing = sharedPref.getBoolean(sharingKey, false)
 
-        return sharing
+        return sharedPref.getBoolean(sharingKey, false)
     }
 
     companion object {
@@ -66,6 +77,7 @@ class PreferenceData private constructor() {
         private const val shpKey = AppConfig.SharedPreferences_KEY
         private const val userKey = "userKey"
         private const val sharingKey = "sharingKey"
+        private const val sharingTimeKey = "sharingTimeKey"
 
 
     }

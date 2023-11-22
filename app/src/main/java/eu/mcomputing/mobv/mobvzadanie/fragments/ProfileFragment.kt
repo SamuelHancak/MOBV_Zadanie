@@ -26,7 +26,7 @@ import androidx.work.WorkManager
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 import eu.mcomputing.mobv.mobvzadanie.R
 import eu.mcomputing.mobv.mobvzadanie.broadcastReceivers.GeofenceBroadcastReceiver
 import eu.mcomputing.mobv.mobvzadanie.data.DataRepository
@@ -35,6 +35,9 @@ import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentProfileBinding
 import eu.mcomputing.mobv.mobvzadanie.viewmodels.ProfileViewModel
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
 import eu.mcomputing.mobv.mobvzadanie.workers.MyWorker
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
@@ -108,11 +111,20 @@ class ProfileFragment : Fragment() {
         }.also { bnd ->
             bnd.bottomBar.setActive(BottomBar.PROFILE)
 
-            bnd.loadProfileBtn.setOnClickListener {
-                val user = PreferenceData.getInstance().getUser(requireContext())
-                user?.let {
-                    viewModel.loadUser(it.id)
-                }
+            val user = PreferenceData.getInstance().getUser(requireContext())
+            user?.let {
+                viewModel.loadUser(it.id)
+            }
+
+            user?.photo?.let {
+//                Glide.with(view.context)
+//                    .load("https://upload.mcomputing.eu/$it")
+//                    .placeholder(R.drawable.baseline_account_box_24) // Replace with your placeholder image
+//                    .error(R.drawable.baseline_feed_24) // Replace with your error image
+//                    .into(bnd.profileImage)
+                Picasso.get().load("https://upload.mcomputing.eu/$it")
+                    .placeholder(R.drawable.baseline_account_box_24)
+                    .error(R.drawable.baseline_feed_24).into(bnd.profileImage)
             }
 
             bnd.logoutBtn.setOnClickListener {
@@ -120,29 +132,52 @@ class ProfileFragment : Fragment() {
                 it.findNavController().navigate(R.id.action_to_intro)
             }
 
-            viewModel.profileResult.observe(viewLifecycleOwner) {
-                if (it.isNotEmpty()) {
-                    Snackbar.make(
-                        bnd.loadProfileBtn,
-                        it,
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }
+            bnd.locationSwitch.isChecked = PreferenceData.getInstance()
+                .getSharing(requireContext()) || (PreferenceData.getInstance()
+                .getTimeSharing(requireContext()) && isWithinTimeRange())
+            bnd.timeLimitedSwitch.isChecked =
+                PreferenceData.getInstance().getTimeSharing(requireContext())
+
+            bnd.locationSwitch.isEnabled = !bnd.timeLimitedSwitch.isChecked
+
+            if (bnd.locationSwitch.isChecked) {
+                turnOnSharing()
+            } else {
+                turnOffSharing()
             }
 
-            bnd.locationSwitch.isChecked = PreferenceData.getInstance().getSharing(requireContext())
-            bnd.locationSwitch.setOnCheckedChangeListener { _, checked ->
-                if (checked) {
+            bnd.locationSwitch.setOnClickListener {
+                if (bnd.locationSwitch.isChecked) {
                     turnOnSharing()
                 } else {
                     turnOffSharing()
+                    PreferenceData.getInstance().putTimeSharing(requireContext(), false)
+                    bnd.timeLimitedSwitch.isChecked = false
+                }
+            }
+
+            bnd.timeLimitedSwitch.setOnClickListener {
+                if (bnd.timeLimitedSwitch.isChecked) {
+                    bnd.locationSwitch.isEnabled = false
+                    val isInTimeRange = isWithinTimeRange()
+
+                    if (isInTimeRange) {
+                        turnOnSharing()
+                    }
+
+                    bnd.locationSwitch.isChecked = isInTimeRange
+                    PreferenceData.getInstance().putTimeSharing(requireContext(), true)
+                    PreferenceData.getInstance().putSharing(requireContext(), isInTimeRange)
+                } else {
+                    bnd.locationSwitch.isEnabled = true
+                    PreferenceData.getInstance().putTimeSharing(requireContext(), false)
                 }
             }
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun turnOnSharing() {
+    fun turnOnSharing() {
         if (!hasPermissions(requireContext())) {
             binding.locationSwitch.isChecked = false
             for (p in PERMISSIONS_REQUIRED) {
@@ -151,6 +186,7 @@ class ProfileFragment : Fragment() {
             return
         }
         PreferenceData.getInstance().putSharing(requireContext(), true)
+        viewModel.sharingLocation.value = true
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -159,22 +195,20 @@ class ProfileFragment : Fragment() {
                 setupGeofence(it)
             }
         }
-
     }
 
-    private fun turnOffSharing() {
+    fun turnOffSharing() {
         PreferenceData.getInstance().putSharing(requireContext(), false)
         removeGeofence()
     }
 
     @SuppressLint("MissingPermission")
     private fun setupGeofence(location: Location) {
-
         val geofencingClient = LocationServices.getGeofencingClient(requireActivity())
 
         val geofence = Geofence.Builder()
             .setRequestId("my-geofence")
-            .setCircularRegion(location.latitude, location.longitude, 100f) // 100m polomer
+            .setCircularRegion(location.latitude, location.longitude, 100f)
             .setExpirationDuration(Geofence.NEVER_EXPIRE)
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
             .build()
@@ -246,5 +280,17 @@ class ProfileFragment : Fragment() {
 
     private fun cancelWorker() {
         WorkManager.getInstance(requireContext()).cancelUniqueWork("myworker")
+    }
+
+    private fun isWithinTimeRange(): Boolean {
+        val currentTime = Calendar.getInstance().time
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val formattedTime = dateFormat.format(currentTime)
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val currentTimeDate = sdf.parse(formattedTime)
+        val startTimeDate = sdf.parse("10:00")
+        val endTimeDate = sdf.parse("17:00")
+
+        return currentTimeDate in startTimeDate..endTimeDate
     }
 }
