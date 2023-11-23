@@ -4,6 +4,8 @@ data class RegistrationResponse(val uid: String, val access: String, val refresh
 
 data class LoginResponse(val uid: String, val access: String, val refresh: String)
 
+data class ChangePasswordResponse(val status: String)
+
 data class UserResponse(val id: String, val name: String, val photo: String)
 
 data class RefreshTokenResponse(val uid: String, val access: String, val refresh: String)

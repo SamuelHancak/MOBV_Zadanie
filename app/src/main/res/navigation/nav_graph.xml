@@ -59,9 +59,17 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.ProfileFragment"
-        android:label="ProfileFragment" />
+        android:label="ProfileFragment">
+        <action
+            android:id="@+id/action_to_password"
+            app:destination="@id/passwordFragment" />
+    </fragment>
 
-
+    <fragment
+        android:id="@+id/passwordFragment"
+        android:name="eu.mcomputing.mobv.mobvzadanie.fragments.PasswordFragment"
+        android:label="PasswordFragment" />
+    
     <action
         android:id="@+id/action_to_feed"
         app:destination="@id/feedFragment" />

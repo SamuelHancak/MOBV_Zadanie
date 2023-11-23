@@ -4,6 +4,8 @@ data class UserRegistrationRequest(val name: String, val email: String, val pass
 
 data class UserLoginRequest(val name: String, val password: String)
 
+data class ChangePasswordRequest(val old_password: String, val new_password: String)
+
 data class RefreshTokenRequest(val refresh: String)
 
 data class GeofenceUpdateRequest(val lat: Double, val lon: Double, val radius: Double)

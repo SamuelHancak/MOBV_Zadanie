@@ -3,6 +3,8 @@ package eu.mcomputing.mobv.mobvzadanie.data.api
 import android.content.Context
 import eu.mcomputing.mobv.mobvzadanie.data.api.helper.AuthInterceptor
 import eu.mcomputing.mobv.mobvzadanie.data.api.helper.TokenAuthenticator
+import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordRequest
+import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordResponse
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceListResponse
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateResponse
@@ -30,6 +32,9 @@ interface ApiService {
 
     @POST("user/login.php")
     suspend fun loginUser(@Body userInfo: UserLoginRequest): Response<LoginResponse>
+
+    @POST("user/password.php")
+    suspend fun changePassword(@Body passwordInfo: ChangePasswordRequest): Response<ChangePasswordResponse>
 
     @GET("user/get.php")
     suspend fun getUser(

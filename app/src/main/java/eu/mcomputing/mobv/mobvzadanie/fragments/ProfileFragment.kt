@@ -117,19 +117,18 @@ class ProfileFragment : Fragment() {
             }
 
             user?.photo?.let {
-//                Glide.with(view.context)
-//                    .load("https://upload.mcomputing.eu/$it")
-//                    .placeholder(R.drawable.baseline_account_box_24) // Replace with your placeholder image
-//                    .error(R.drawable.baseline_feed_24) // Replace with your error image
-//                    .into(bnd.profileImage)
                 Picasso.get().load("https://upload.mcomputing.eu/$it")
                     .placeholder(R.drawable.baseline_account_box_24)
-                    .error(R.drawable.baseline_feed_24).into(bnd.profileImage)
+                    .error(R.drawable.baseline_account_box_24).into(bnd.profileImage)
             }
 
             bnd.logoutBtn.setOnClickListener {
                 PreferenceData.getInstance().clearData(requireContext())
                 it.findNavController().navigate(R.id.action_to_intro)
+            }
+
+            bnd.changePasswordBtn.setOnClickListener {
+                it.findNavController().navigate(R.id.action_to_password)
             }
 
             bnd.locationSwitch.isChecked = PreferenceData.getInstance()
