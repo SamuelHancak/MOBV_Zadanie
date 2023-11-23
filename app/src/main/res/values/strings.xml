@@ -35,4 +35,8 @@
     <string name="new_password_placeholder">Insert new password</string>
     <string name="confirm_password">Confirm password</string>
     <string name="confirm_password_placeholder">Insert new password again</string>
+    <string name="choose_image">Choose image</string>
+    <string name="upload_image">Upload image</string>
+    <string name="change_profile_pic">Change picture</string>
+    <string name="delete_image">Delete image</string>
 </resources>

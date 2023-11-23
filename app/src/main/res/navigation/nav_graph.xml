@@ -63,13 +63,22 @@
         <action
             android:id="@+id/action_to_password"
             app:destination="@id/passwordFragment" />
+
+        <action
+            android:id="@+id/action_to_image"
+            app:destination="@id/imageFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/passwordFragment"
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.PasswordFragment"
         android:label="PasswordFragment" />
-    
+
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="eu.mcomputing.mobv.mobvzadanie.fragments.ImageFragment"
+        android:label="ImageFragment" />
+
     <action
         android:id="@+id/action_to_feed"
         app:destination="@id/feedFragment" />

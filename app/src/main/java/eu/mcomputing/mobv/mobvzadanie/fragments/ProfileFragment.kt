@@ -51,7 +51,8 @@ class ProfileFragment : Fragment() {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.READ_MEDIA_IMAGES
             )
         }
 
@@ -59,14 +60,16 @@ class ProfileFragment : Fragment() {
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE
             )
         }
 
         else -> {
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE
             )
         }
     }
@@ -112,14 +115,16 @@ class ProfileFragment : Fragment() {
             bnd.bottomBar.setActive(BottomBar.PROFILE)
 
             val user = PreferenceData.getInstance().getUser(requireContext())
-            user?.let {
-                viewModel.loadUser(it.id)
-            }
+            user?.let { userIt ->
+                viewModel.loadUser(userIt.id)
 
-            user?.photo?.let {
-                Picasso.get().load("https://upload.mcomputing.eu/$it")
-                    .placeholder(R.drawable.baseline_account_box_24)
-                    .error(R.drawable.baseline_account_box_24).into(bnd.profileImage)
+                viewModel.userResult.observe(viewLifecycleOwner) {
+                    if (it != null && it.photo.isNotEmpty()) {
+                        Picasso.get().load("https://upload.mcomputing.eu/${it.photo}")
+                            .placeholder(R.drawable.baseline_account_box_24)
+                            .error(R.drawable.baseline_account_box_24).into(bnd.profileImage)
+                    }
+                }
             }
 
             bnd.logoutBtn.setOnClickListener {
@@ -129,6 +134,10 @@ class ProfileFragment : Fragment() {
 
             bnd.changePasswordBtn.setOnClickListener {
                 it.findNavController().navigate(R.id.action_to_password)
+            }
+
+            bnd.uploadImageBtn.setOnClickListener {
+                it.findNavController().navigate(R.id.action_to_image)
             }
 
             bnd.locationSwitch.isChecked = PreferenceData.getInstance()

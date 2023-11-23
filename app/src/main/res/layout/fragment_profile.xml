@@ -22,10 +22,10 @@
             android:layout_marginTop="16dp"
             android:contentDescription="@string/profile_user_pic"
             android:scaleType="centerCrop"
+            android:src="@drawable/baseline_account_box_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <!-- User Information Section -->
         <TextView
@@ -37,7 +37,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_image" />
-
 
         <!-- Location Sharing Section -->
         <TextView
@@ -79,25 +78,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/time_limited_label" />
 
-        <!-- Change Password Button -->
         <Button
             android:id="@+id/change_password_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/change_password"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/upload_image_btn"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/time_limited_switch" />
 
-        <!-- Map Section -->
+        <Button
+            android:id="@+id/upload_image_btn"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/change_profile_pic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@id/change_password_btn"
+            app:layout_constraintTop_toBottomOf="@id/time_limited_switch" />
+
         <com.mapbox.maps.MapView
             android:id="@+id/mapView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/change_password_btn" />
+            app:layout_constraintTop_toBottomOf="@id/upload_image_btn" />
 
         <!-- Logout Button -->
         <Button

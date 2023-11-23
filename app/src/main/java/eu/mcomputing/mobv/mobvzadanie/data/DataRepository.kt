@@ -1,6 +1,7 @@
 package eu.mcomputing.mobv.mobvzadanie.data
 
 import android.content.Context
+import android.net.Uri
 import eu.mcomputing.mobv.mobvzadanie.data.api.ApiService
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateRequest
@@ -10,7 +11,13 @@ import eu.mcomputing.mobv.mobvzadanie.data.db.AppRoomDatabase
 import eu.mcomputing.mobv.mobvzadanie.data.db.entities.GeofenceEntity
 import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
 import eu.mcomputing.mobv.mobvzadanie.data.model.User
+import eu.mcomputing.mobv.mobvzadanie.utils.URIPathHelper
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import venaka.bioapp.data.db.LocalCache
+import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
@@ -183,6 +190,38 @@ class DataRepository private constructor(
         return "Fatal error. Failed to change password."
     }
 
+    suspend fun uploadImage(
+        uri: Uri?, context: Context
+    ): String {
+        try {
+            if (uri == null || uri.path == null || uri.path!!.isEmpty()) {
+                return ("Select image first.")
+            }
+
+            val uriPathHelper = URIPathHelper()
+            val filePath = uriPathHelper.getPath(context, uri)
+            val file = File(filePath!!)
+            val requestFile: RequestBody =
+                file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val multiPartBody = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+            val response = service.uploadPhoto(multiPartBody)
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    return "Success! Image was uploaded."
+                }
+            }
+            return "Failed to upload image."
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return "Check internet connection. Failed to upload image."
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return "Fatal error. Failed to upload image."
+    }
+
     suspend fun apiGetUser(
         uid: String
     ): Pair<String, User?> {
@@ -277,5 +316,25 @@ class DataRepository private constructor(
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
+    }
+
+    suspend fun removeImage(): String {
+        try {
+            val response = service.deletePhoto()
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    return "Success! Profile picture was deleted."
+                }
+            }
+
+            return "Failed to delete profile picture."
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return "Check internet connection. Failed to delete profile picture."
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return "Fatal error. Failed to delete profile picture."
     }
 }
