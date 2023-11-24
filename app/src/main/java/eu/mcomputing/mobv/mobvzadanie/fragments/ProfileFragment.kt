@@ -27,6 +27,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
@@ -58,6 +59,7 @@ class ProfileFragment : Fragment() {
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
     private lateinit var annotationManager: CircleAnnotationManager
+    private var lastLocation: Point? = null
 
     private val PERMISSIONS_REQUIRED = when {
         Build.VERSION.SDK_INT >= 33 -> { // android 13
@@ -88,7 +90,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    val requestPermissionLauncher =
+    private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) {}
@@ -102,17 +104,20 @@ class ProfileFragment : Fragment() {
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-        mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
-        annotationManager.deleteAll()
-        val pointAnnotationOptions = CircleAnnotationOptions()
-            .withPoint(it)
-            .withCircleRadius(100.0)
-            .withCircleOpacity(0.2)
-            .withCircleColor("#000")
-            .withCircleStrokeWidth(2.0)
-            .withCircleStrokeColor("#fff")
-        annotationManager.create(pointAnnotationOptions)
+        if (lastLocation == null || lastLocation != it) {
+            lastLocation = it
+            mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(14.0).build())
+            mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
+            annotationManager.deleteAll()
+            val pointAnnotationOptions = CircleAnnotationOptions()
+                .withPoint(it)
+                .withCircleRadius(100.0)
+                .withCircleOpacity(0.2)
+                .withCircleColor("#000")
+                .withCircleStrokeWidth(2.0)
+                .withCircleStrokeColor("#fff")
+            annotationManager.create(pointAnnotationOptions)
+        }
     }
 
     private val onMoveListener = object : OnMoveListener {
