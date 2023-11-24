@@ -2,12 +2,17 @@ package eu.mcomputing.mobv.mobvzadanie.fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,11 +22,12 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.google.gson.JsonParser
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
@@ -35,11 +41,18 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.squareup.picasso.Picasso
 import eu.mcomputing.mobv.mobvzadanie.R
 import eu.mcomputing.mobv.mobvzadanie.data.DataRepository
+import eu.mcomputing.mobv.mobvzadanie.data.PreferenceData
 import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentMapBinding
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Random
 import kotlin.math.cos
 import kotlin.math.sin
@@ -80,6 +93,14 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val hasPermission = Environment.isExternalStorageManager()
+            if (!hasPermission) {
+                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                startActivity(intent)
+            }
+        }
+
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
         }.also { bnd ->
@@ -90,6 +111,11 @@ class MapFragment : Fragment() {
 
             annotationManager = bnd.mapView.annotations.createCircleAnnotationManager()
             annotationImgManager = bnd.mapView.annotations.createPointAnnotationManager()
+
+            annotationImgManager.addClickListener {
+                Log.d("annotationImgManager", it.getData().toString())
+                true
+            }
 
             val hasPermission = hasPermissions(requireContext())
             onMapReady(hasPermission)
@@ -154,22 +180,10 @@ class MapFragment : Fragment() {
         }
     }
 
-
     private fun initLocationComponent() {
         val locationComponentPlugin = binding.mapView.location
         locationComponentPlugin.updateSettings {
             this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.baseline_account_box_24,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    requireContext(),
-                    R.drawable.baseline_account_box_24,
-                ),
-            )
-
         }
     }
 
@@ -211,41 +225,78 @@ class MapFragment : Fragment() {
 
     private fun addMarker(point: Point) {
         val circleRadius = 100.0
+        lifecycleScope.launch {
 
-        if (selectedPoint == null) {
-            annotationManager.deleteAll()
-            val pointAnnotationOptions = CircleAnnotationOptions()
-                .withPoint(point)
-                .withCircleRadius(circleRadius)
-                .withCircleOpacity(0.2)
-                .withCircleColor("#000")
-                .withCircleStrokeWidth(2.0)
-                .withCircleStrokeColor("#ffffff")
+            if (selectedPoint == null) {
+                annotationManager.deleteAll()
+                val pointAnnotationOptions = CircleAnnotationOptions()
+                    .withPoint(point)
+                    .withCircleRadius(circleRadius)
+                    .withCircleOpacity(0.2)
+                    .withCircleColor("#000")
+                    .withCircleStrokeWidth(2.0)
+                    .withCircleStrokeColor("#ffffff")
 
-            selectedPoint = annotationManager.create(pointAnnotationOptions)
+                selectedPoint = annotationManager.create(pointAnnotationOptions)
 
-            if (users != null) {
-                val randomUserAnnotations = mutableListOf<PointAnnotationOptions>()
-                for (user in users!!) {
-                    val randomPoint = generateRandomPoint(point)
-                    val imgAnnotationOptions2 = PointAnnotationOptions()
-                        .withPoint(randomPoint)
-                        .withIconSize(1.5)
-                    bitmapFromDrawableRes(
-                        requireContext(),
-                        R.drawable.baseline_account_box_24
-                    )?.let {
-                        imgAnnotationOptions2.withIconImage(it)
+                if (users != null) {
+                    val randomUserAnnotations = mutableListOf<PointAnnotationOptions>()
+                    for (user in users!!) {
+                        val randomPoint: Point
+                        if (user.uid == PreferenceData.getInstance()
+                                .getUser(requireContext())?.id
+                        ) {
+                            randomPoint = point
+                        } else {
+                            randomPoint = generateRandomPoint(point)
+                        }
+                        val imgAnnotationOptions2 = PointAnnotationOptions()
+                            .withPoint(randomPoint)
+                            .withIconSize(1.5)
+                            .withData(JsonParser.parseString("{\"id\": ${user.uid}}"))
+                        if (user.photo.isEmpty()) {
+                            bitmapFromDrawableRes(
+                                requireContext(),
+                                R.drawable.baseline_account_box_24
+                            )?.let {
+                                imgAnnotationOptions2.withIconImage(it)
+                            }
+                        } else {
+                            val bitmap =
+                                loadBitmapFromUrl(user.photo)
+                            imgAnnotationOptions2.withIconImage(bitmap!!).withIconSize(0.2)
+                        }
+                        randomUserAnnotations.add(imgAnnotationOptions2)
                     }
-                    randomUserAnnotations.add(imgAnnotationOptions2)
+                    annotationImgManager.create(randomUserAnnotations)
                 }
-                annotationImgManager.create(randomUserAnnotations)
+            } else {
+                selectedPoint?.let {
+                    it.point = point
+                    annotationManager.update(it)
+                }
             }
-        } else {
-            selectedPoint?.let {
-                it.point = point
-                annotationManager.update(it)
+
+        }
+    }
+
+    private suspend fun loadBitmapFromUrl(image: String): Bitmap? = withContext(Dispatchers.IO) {
+        try {
+            val bitmap = Picasso.get().load("https://upload.mcomputing.eu/${image}").get()
+
+            var file = context?.getDir("Images", Context.MODE_PRIVATE)
+            if (!file?.exists()!!) {
+                file.mkdir()
             }
+            file = File(file, image.split("/").last())
+            val out = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
+            out.flush()
+            out.close()
+            BitmapFactory.decodeFile(file.absolutePath)
+        } catch (e: Exception) {
+            Log.e("MapFragment", e.toString())
+            null
         }
     }
 
@@ -276,5 +327,4 @@ class MapFragment : Fragment() {
             gestures.removeOnMoveListener(onMoveListener)
         }
     }
-
 }
