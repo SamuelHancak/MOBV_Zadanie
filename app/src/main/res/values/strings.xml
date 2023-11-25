@@ -38,6 +38,9 @@
     <string name="choose_image">Choose image</string>
     <string name="upload_image">Upload image</string>
     <string name="change_profile_pic">Change picture</string>
-    <string name="delete_image">Delete image</string>
+    <string name="delete_image">Delete current profile picture</string>
     <string name="forgotten_password">Forgotten password</string>
+    <string name="location_title">Location access required</string>
+    <string name="location_desc">To see users around you, please enable location permissions.</string>
+    <string name="location_btn">Go to profile</string>
 </resources>

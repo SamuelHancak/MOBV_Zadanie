@@ -9,39 +9,55 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp">
+        android:background="#123"
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:letterSpacing="0.1"
             android:text="@string/main_title"
             android:textAlignment="center"
-            android:textFontWeight="800"
+            android:textAllCaps="true"
+            android:textColor="#fff"
             android:textSize="40sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textStyle="bold"
+            app:elevation="2dp"
+            app:layout_constraintBottom_toTopOf="@+id/login"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
         <Button
             android:id="@+id/login"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:width="150dp"
+            android:backgroundTint="#fff"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/title_login"
+            android:textAllCaps="true"
+            android:textColor="#123"
+            android:textStyle="bold"
+            app:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/signup"
-            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/signup"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:width="150dp"
+            android:layout_marginStart="16dp"
+            android:backgroundTint="#fff"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/title_signup"
+            android:textAllCaps="true"
+            android:textColor="#123"
+            android:textStyle="bold"
+            app:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/login" />

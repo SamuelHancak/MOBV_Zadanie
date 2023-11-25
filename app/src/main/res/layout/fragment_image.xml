@@ -15,40 +15,64 @@
 
         <ImageView
             android:id="@+id/profileImageView"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:contentDescription="@string/profile_user_pic"
             android:src="@drawable/baseline_image_24"
             app:layout_constraintBottom_toTopOf="@+id/uploadButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.6" />
-
+            app:layout_constraintTop_toTopOf="parent" />
+        
         <Button
             android:id="@+id/chooseImageButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/choose_image"
-            app:layout_constraintEnd_toStartOf="@id/deleteImageButton"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
 
-        <Button
+        <TextView
             android:id="@+id/deleteImageButton"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/delete_image"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorAccent"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/chooseImageButton"
-            app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chooseImageButton" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:indeterminateTintMode="src_atop"
+            android:progress="100"
+            android:progressTint="#123"
+            app:layout_constraintEnd_toEndOf="@id/deleteImageButton"
+            app:layout_constraintStart_toStartOf="@id/deleteImageButton"
+            app:layout_constraintTop_toBottomOf="@id/deleteImageButton" />
 
         <Button
             android:id="@+id/uploadButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/upload_image"
+            android:textAllCaps="true"
+            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/bottom_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
