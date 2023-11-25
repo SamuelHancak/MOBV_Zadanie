@@ -15,7 +15,6 @@ import eu.mcomputing.mobv.mobvzadanie.data.PreferenceData
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentSignupBinding
 import eu.mcomputing.mobv.mobvzadanie.viewmodels.AuthViewModel
 
-
 class SignupFragment : Fragment() {
     private lateinit var viewModel: AuthViewModel
     private lateinit var binding: FragmentSignupBinding
@@ -45,8 +44,10 @@ class SignupFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             model = viewModel
         }.also { bnd ->
+            viewModel.logoutUser()
+
             viewModel.registrationResult.observe(viewLifecycleOwner) {
-                if (it.isNotEmpty()) {
+                if (it !== null && it.isNotEmpty()) {
                     Snackbar.make(
                         bnd.submitButton,
                         it,
@@ -55,15 +56,19 @@ class SignupFragment : Fragment() {
                 }
             }
 
-            viewModel.userResult.observe(viewLifecycleOwner) {
-                it?.let { user ->
-                    PreferenceData.getInstance().putUser(requireContext(), user)
-                    if (PreferenceData.getInstance().getSharing(requireContext())) {
-                        requireView().findNavController().navigate(R.id.action_to_map)
-                    } else {
-                        requireView().findNavController().navigate(R.id.action_to_feed_location)
-                    }
-                } ?: PreferenceData.getInstance().putUser(requireContext(), null)
+            bnd.submitButton.setOnClickListener {
+                viewModel.registerUser()
+                viewModel.userResult.observe(viewLifecycleOwner) {
+                    it?.let { user ->
+                        PreferenceData.getInstance().putUser(requireContext(), user)
+                        if (PreferenceData.getInstance().getSharing(requireContext())) {
+                            requireView().findNavController().navigate(R.id.action_to_map)
+                        } else {
+                            requireView().findNavController().navigate(R.id.action_to_profile)
+                        }
+                    } ?: PreferenceData.getInstance().putUser(requireContext(), null)
+                }
+                viewModel.clearInputs()
             }
 
             bnd.backBtn.apply {

@@ -76,11 +76,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_password" />
 
+        <TextView
+            android:id="@+id/forgot_password_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/forgotten_password"
+            android:textColor="?attr/colorAccent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_password" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:indeterminateTintMode="src_atop"
+            android:progress="100"
+            android:progressTint="#000"
+            app:layout_constraintEnd_toEndOf="@id/forgot_password_text"
+            app:layout_constraintStart_toStartOf="@id/forgot_password_text"
+            app:layout_constraintTop_toBottomOf="@id/forgot_password_text" />
+
         <Button
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{()->model.loginUser()}"
+            android:width="150dp"
             android:text="@string/prihlasit_sa"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/back_btn"
@@ -92,10 +117,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:width="150dp"
             android:text="@string/back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/submit_button" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

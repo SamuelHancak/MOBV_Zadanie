@@ -33,3 +33,5 @@ data class GeofenceListAllResponse(
 data class GeofenceUpdateResponse(val success: String)
 
 data class ImageResponse(val id: String, val name: String, val photo: String)
+
+data class ForgottenPasswordResponse(val status: String, val message: String)

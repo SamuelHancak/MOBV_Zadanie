@@ -36,7 +36,7 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -44,8 +44,10 @@ class LoginFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             model = viewModel
         }.also { bnd ->
+            viewModel.logoutUser()
+
             viewModel.loginResult.observe(viewLifecycleOwner) {
-                if (it.isNotEmpty()) {
+                if (it !== null && it.isNotEmpty()) {
                     Snackbar.make(
                         bnd.submitButton,
                         it,
@@ -54,15 +56,34 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            viewModel.userResult.observe(viewLifecycleOwner) {
-                it?.let { user ->
-                    PreferenceData.getInstance().putUser(requireContext(), user)
-                    if (PreferenceData.getInstance().getSharing(requireContext())) {
-                        requireView().findNavController().navigate(R.id.action_to_map)
-                    } else {
-                        requireView().findNavController().navigate(R.id.action_to_feed_location)
+            bnd.forgotPasswordText.setOnClickListener {
+                viewModel.forgottenPassword()
+                viewModel.forgotPasswordResult.observe(viewLifecycleOwner) {
+                    if (it.second.isNotEmpty()) {
+                        Snackbar.make(
+                            bnd.forgotPasswordText,
+                            it.second,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     }
-                } ?: PreferenceData.getInstance().putUser(requireContext(), null)
+                }
+            }
+
+            bnd.submitButton.setOnClickListener {
+                viewModel.loginUser()
+                viewModel.userResult.observe(viewLifecycleOwner) {
+                    it?.let { user ->
+                        PreferenceData.getInstance().putUser(requireContext(), user)
+                        if (PreferenceData.getInstance().getSharing(requireContext())) {
+                            requireView().findNavController().navigate(R.id.action_to_map)
+                        } else {
+                            requireView().findNavController().navigate(R.id.action_to_profile)
+                        }
+                    } ?: PreferenceData.getInstance().putUser(requireContext(), null)
+                    if (it !== null) {
+                        viewModel.clearInputs()
+                    }
+                }
             }
 
             bnd.backBtn.apply {

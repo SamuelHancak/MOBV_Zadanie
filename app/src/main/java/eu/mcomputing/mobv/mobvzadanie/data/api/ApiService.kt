@@ -5,6 +5,8 @@ import eu.mcomputing.mobv.mobvzadanie.data.api.helper.AuthInterceptor
 import eu.mcomputing.mobv.mobvzadanie.data.api.helper.TokenAuthenticator
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordResponse
+import eu.mcomputing.mobv.mobvzadanie.data.api.model.ForgottenPasswordRequest
+import eu.mcomputing.mobv.mobvzadanie.data.api.model.ForgottenPasswordResponse
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceListResponse
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateResponse
@@ -70,6 +72,9 @@ interface ApiService {
 
     @DELETE("https://upload.mcomputing.eu/user/photo.php")
     suspend fun deletePhoto(): Response<ImageResponse>
+
+    @POST("user/reset.php")
+    suspend fun forgottenPassword(@Body email: ForgottenPasswordRequest): Response<ForgottenPasswordResponse>
 
     companion object {
         fun create(context: Context): ApiService {

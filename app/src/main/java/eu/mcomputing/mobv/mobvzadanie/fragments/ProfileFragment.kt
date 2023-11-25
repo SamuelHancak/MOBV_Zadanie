@@ -182,6 +182,7 @@ class ProfileFragment : Fragment() {
 
             bnd.logoutBtn.setOnClickListener {
                 PreferenceData.getInstance().clearData(requireContext())
+                PreferenceData.getInstance().clearUser(requireContext())
                 it.findNavController().navigate(R.id.action_to_intro)
             }
 

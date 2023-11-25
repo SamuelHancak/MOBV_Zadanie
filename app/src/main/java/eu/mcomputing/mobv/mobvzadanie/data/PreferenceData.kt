@@ -19,6 +19,13 @@ class PreferenceData private constructor() {
         editor.apply()
     }
 
+    fun clearUser(context: Context?) {
+        val sharedPref = getSharedPreferences(context) ?: return
+        val editor = sharedPref.edit()
+        editor.remove(userKey)
+        editor.apply()
+    }
+
     fun putUser(context: Context?, user: User?) {
         val sharedPref = getSharedPreferences(context) ?: return
         val editor = sharedPref.edit()

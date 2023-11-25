@@ -9,14 +9,17 @@ import eu.mcomputing.mobv.mobvzadanie.data.model.User
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val dataRepository: DataRepository) : ViewModel() {
-    private val _registrationResult = MutableLiveData<String>()
-    val registrationResult: LiveData<String> get() = _registrationResult
+    private val _registrationResult = MutableLiveData<String?>()
+    val registrationResult: LiveData<String?> get() = _registrationResult
 
-    private val _loginResult = MutableLiveData<String>()
-    val loginResult: LiveData<String> get() = _loginResult
+    private val _loginResult = MutableLiveData<String?>()
+    val loginResult: LiveData<String?> get() = _loginResult
 
     private val _userResult = MutableLiveData<User?>()
     val userResult: LiveData<User?> get() = _userResult
+
+    private val _forgotPasswordResult = MutableLiveData<Pair<String, String>>()
+    val forgotPasswordResult: LiveData<Pair<String, String>> get() = _forgotPasswordResult
 
     val username = MutableLiveData<String>()
     val email = MutableLiveData<String>()
@@ -41,6 +44,29 @@ class AuthViewModel(private val dataRepository: DataRepository) : ViewModel() {
             val result = dataRepository.apiLoginUser(username.value ?: "", password.value ?: "")
             _loginResult.postValue(result.first)
             _userResult.postValue(result.second)
+        }
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            _loginResult.postValue(null)
+            _userResult.postValue(null)
+        }
+    }
+
+    fun forgottenPassword() {
+        viewModelScope.launch {
+            val result = dataRepository.forgottenPassword(username.value ?: "")
+            _forgotPasswordResult.postValue(result)
+        }
+    }
+
+    fun clearInputs() {
+        viewModelScope.launch {
+            username.postValue("")
+            email.postValue("")
+            password.postValue("")
+            repeatPassword.postValue("")
         }
     }
 }

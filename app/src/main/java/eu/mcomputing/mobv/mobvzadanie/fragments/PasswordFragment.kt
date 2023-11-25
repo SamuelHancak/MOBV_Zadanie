@@ -15,13 +15,13 @@ import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentPasswordBinding
 import eu.mcomputing.mobv.mobvzadanie.viewmodels.PasswordViewModel
 
 class PasswordFragment : Fragment(R.layout.fragment_password) {
-    private lateinit var modelViewModel: PasswordViewModel
+    private lateinit var viewModel: PasswordViewModel
     private lateinit var binding: FragmentPasswordBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        modelViewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
+        viewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return PasswordViewModel(DataRepository.getInstance(requireContext())) as T
             }
@@ -41,9 +41,9 @@ class PasswordFragment : Fragment(R.layout.fragment_password) {
 
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
-            model = modelViewModel
+            model = viewModel
         }.also { bnd ->
-            modelViewModel.changePasswordResult.observe(viewLifecycleOwner) {
+            viewModel.changePasswordResult.observe(viewLifecycleOwner) {
                 if (it.isNotEmpty()) {
                     Snackbar.make(
                         bnd.changePasswordButton,
@@ -56,11 +56,10 @@ class PasswordFragment : Fragment(R.layout.fragment_password) {
                         bnd.editTextPassword.text.clear()
                         bnd.editTextNewPassword.text.clear()
                     }
-                    
-                    modelViewModel.clearResult()
+
+                    viewModel.clearResult()
                 }
             }
-
         }
     }
 }

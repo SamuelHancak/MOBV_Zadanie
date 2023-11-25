@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import eu.mcomputing.mobv.mobvzadanie.data.api.ApiService
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.ChangePasswordRequest
+import eu.mcomputing.mobv.mobvzadanie.data.api.model.ForgottenPasswordRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.UserLoginRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.UserRegistrationRequest
@@ -337,4 +338,31 @@ class DataRepository private constructor(
         }
         return "Fatal error. Failed to delete profile picture."
     }
+
+    suspend fun forgottenPassword(email: String?): Pair<String, String> {
+        try {
+            if (email.isNullOrEmpty()) {
+                return Pair("failure", "Insert you email into username field.")
+            }
+
+            val response = service.forgottenPassword(ForgottenPasswordRequest(email))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    return Pair(
+                        it.status,
+                        "Email for password recovery was sent. Check your inbox."
+                    )
+                }
+            }
+
+            return Pair("failure", "Failed to send email")
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return Pair("failure", "Check internet connection. Failed to send email.")
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return Pair("failure", "Fatal error. Failed to send email.")
+    }
 }
+

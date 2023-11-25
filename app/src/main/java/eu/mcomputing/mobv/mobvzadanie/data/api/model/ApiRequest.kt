@@ -9,3 +9,5 @@ data class ChangePasswordRequest(val old_password: String, val new_password: Str
 data class RefreshTokenRequest(val refresh: String)
 
 data class GeofenceUpdateRequest(val lat: Double, val lon: Double, val radius: Double)
+
+data class ForgottenPasswordRequest(val email: String)
