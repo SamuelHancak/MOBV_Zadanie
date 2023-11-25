@@ -23,6 +23,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import com.google.gson.JsonParser
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
@@ -148,7 +149,18 @@ class MapFragment : Fragment() {
             annotationImgManager = bnd.mapView.annotations.createPointAnnotationManager()
 
             annotationImgManager.addClickListener {
-                Log.d("annotationImgManager", it.getData().toString())
+                PreferenceData.getInstance().putUserProfileId(
+                    requireContext(),
+                    it.getData()?.asJsonObject?.get("id").toString()
+                )
+                if (PreferenceData.getInstance()
+                        .getUserProfileId(requireContext()) == PreferenceData.getInstance()
+                        .getUser(requireContext())?.id
+                ) {
+                    requireView().findNavController().navigate(R.id.action_to_profile)
+                } else {
+                    requireView().findNavController().navigate(R.id.action_to_user)
+                }
                 true
             }
 

@@ -36,6 +36,21 @@ class PreferenceData private constructor() {
         return User.fromJson(json)
     }
 
+    fun putUserProfileId(context: Context?, id: String?) {
+        val sharedPref = getSharedPreferences(context) ?: return
+        val editor = sharedPref.edit()
+        id?.let {
+            editor.putString(userProfileId, it)
+        } ?: editor.remove(userProfileId)
+
+        editor.apply()
+    }
+
+    fun getUserProfileId(context: Context?): String? {
+        val sharedPref = getSharedPreferences(context) ?: return null
+        return sharedPref.getString(userProfileId, null)
+    }
+
     fun putTimeSharing(context: Context?, sharing: Boolean) {
         val sharedPref = getSharedPreferences(context) ?: return
         val editor = sharedPref.edit()
@@ -65,7 +80,6 @@ class PreferenceData private constructor() {
     companion object {
         @Volatile
         private var INSTANCE: PreferenceData? = null
-
         private val lock = Any()
 
         fun getInstance(): PreferenceData =
@@ -78,8 +92,6 @@ class PreferenceData private constructor() {
         private const val userKey = "userKey"
         private const val sharingKey = "sharingKey"
         private const val sharingTimeKey = "sharingTimeKey"
-
-
+        private const val userProfileId = "userProfileId"
     }
-
 }

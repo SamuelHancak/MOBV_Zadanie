@@ -174,11 +174,9 @@ class ProfileFragment : Fragment() {
                 viewModel.loadUser(userIt.id)
 
                 viewModel.userResult.observe(viewLifecycleOwner) {
-                    if (it != null && it.photo.isNotEmpty()) {
-                        Picasso.get().load("https://upload.mcomputing.eu/${it.photo}")
-                            .placeholder(R.drawable.baseline_account_box_24)
-                            .error(R.drawable.baseline_account_box_24).into(bnd.profileImage)
-                    }
+                    Picasso.get().load("https://upload.mcomputing.eu/${it?.photo}")
+                        .placeholder(R.drawable.baseline_account_box_24)
+                        .error(R.drawable.baseline_account_box_24).into(bnd.profileImage)
                 }
             }
 

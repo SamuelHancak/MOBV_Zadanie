@@ -1,6 +1,5 @@
 package eu.mcomputing.mobv.mobvzadanie.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,7 +19,6 @@ class PasswordViewModel(private val dataRepository: DataRepository) : ViewModel(
             val result =
                 dataRepository.apiChangePassword(password.value ?: "", repeatPassword.value ?: "")
             _changePasswordResult.postValue(result)
-            Log.d("PasswordViewModel", _changePasswordResult.value.toString())
         }
     }
 

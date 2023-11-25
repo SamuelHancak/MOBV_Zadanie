@@ -79,6 +79,11 @@
         android:name="eu.mcomputing.mobv.mobvzadanie.fragments.ImageFragment"
         android:label="ImageFragment" />
 
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="eu.mcomputing.mobv.mobvzadanie.fragments.UserFragment"
+        android:label="UserFragment" />
+
     <action
         android:id="@+id/action_to_feed"
         app:destination="@id/feedFragment" />
@@ -99,4 +104,8 @@
         android:id="@+id/action_to_intro"
         app:destination="@id/introFragment"
         app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_to_user"
+        app:destination="@id/userFragment" />
 </navigation>
