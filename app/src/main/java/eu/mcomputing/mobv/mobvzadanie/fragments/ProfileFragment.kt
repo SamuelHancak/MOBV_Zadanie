@@ -95,7 +95,7 @@ class ProfileFragment : Fragment() {
             ActivityResultContracts.RequestPermission()
         ) {}
 
-    fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
+    private fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -155,9 +155,10 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (!hasPermissions(requireContext())) {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            for (p in PERMISSIONS_REQUIRED) {
+                requestPermissionLauncher.launch(p)
+            }
         }
-
 
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
@@ -290,7 +291,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    fun turnOffSharing() {
+    private fun turnOffSharing() {
         PreferenceData.getInstance().putSharing(requireContext(), false)
         removeGeofence()
     }
