@@ -33,10 +33,11 @@
 
         <Button
             android:id="@+id/login"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#fff"
             android:fontFamily="sans-serif-condensed"
+            android:minWidth="150dp"
             android:text="@string/title_login"
             android:textAllCaps="true"
             android:textColor="#123"
@@ -48,11 +49,12 @@
 
         <Button
             android:id="@+id/signup"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:backgroundTint="#fff"
             android:fontFamily="sans-serif-condensed"
+            android:minWidth="150dp"
             android:text="@string/title_signup"
             android:textAllCaps="true"
             android:textColor="#123"

@@ -15,6 +15,7 @@
     <string name="zopakujte_heslo">Repeat password</string>
     <string name="registruj_sa">Register</string>
     <string name="prihlasit_sa">Login</string>
+    <string name="sign_in">Sign in</string>
     <string name="profile">Profile</string>
     <string name="nacitaj_profil">Load profile</string>
     <string name="odhlasit_sa">Log out</string>
@@ -43,4 +44,5 @@
     <string name="location_title">Location access required</string>
     <string name="location_desc">To see users around you, please enable location permissions.</string>
     <string name="location_btn">Go to profile</string>
+    <string name="password_manager">Password manager</string>
 </resources>

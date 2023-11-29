@@ -57,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:contentDescription="@string/share_location"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/location_label" />
@@ -79,18 +80,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:contentDescription="@string/share_location_time_limited"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/time_limited_label" />
 
         <Button
             android:id="@+id/change_password_btn"
-            android:layout_width="180dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:fontFamily="sans-serif-condensed"
-            android:text="@string/change_password"
+            android:minWidth="180dp"
+            android:text="@string/password_manager"
             android:textAllCaps="true"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/upload_image_btn"
@@ -100,10 +103,11 @@
 
         <Button
             android:id="@+id/upload_image_btn"
-            android:layout_width="180dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:fontFamily="sans-serif-condensed"
+            android:minWidth="180dp"
             android:text="@string/change_profile_pic"
             android:textAllCaps="true"
             android:textStyle="bold"
