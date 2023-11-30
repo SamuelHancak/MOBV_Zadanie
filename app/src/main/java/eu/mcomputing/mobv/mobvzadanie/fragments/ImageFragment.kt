@@ -1,12 +1,10 @@
 package eu.mcomputing.mobv.mobvzadanie.fragments
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,9 +73,7 @@ class ImageFragment : Fragment(R.layout.fragment_image) {
         }
     }
 
-    @SuppressLint("NewApi")
     private fun openImageChooser() {
-        Log.d("ImageFragment", "Permission is granted")
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI).also {
             it.type = "image/*"
             val mimeTypes = arrayOf("image/jpeg", "image/jpg")
@@ -101,6 +97,4 @@ class ImageFragment : Fragment(R.layout.fragment_image) {
     companion object {
         const val REQUEST_CODE_IMAGE = 101
     }
-
-
 }

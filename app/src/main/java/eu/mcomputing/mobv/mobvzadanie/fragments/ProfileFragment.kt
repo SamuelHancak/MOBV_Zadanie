@@ -22,6 +22,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
@@ -46,12 +47,11 @@ import eu.mcomputing.mobv.mobvzadanie.broadcastReceivers.GeofenceBroadcastReceiv
 import eu.mcomputing.mobv.mobvzadanie.data.DataRepository
 import eu.mcomputing.mobv.mobvzadanie.data.PreferenceData
 import eu.mcomputing.mobv.mobvzadanie.databinding.FragmentProfileBinding
+import eu.mcomputing.mobv.mobvzadanie.utils.WithinTimeHelper.isWithinTimeRange
 import eu.mcomputing.mobv.mobvzadanie.viewmodels.ProfileViewModel
 import eu.mcomputing.mobv.mobvzadanie.widgets.bottomBar.BottomBar
+import eu.mcomputing.mobv.mobvzadanie.workers.GeofenceWorker
 import eu.mcomputing.mobv.mobvzadanie.workers.MyWorker
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
@@ -221,6 +221,7 @@ class ProfileFragment : Fragment() {
 
             bnd.timeLimitedSwitch.setOnClickListener {
                 if (bnd.timeLimitedSwitch.isChecked) {
+                    runGeofenceWorker()
                     bnd.locationSwitch.isEnabled = false
                     val isInTimeRange = isWithinTimeRange()
 
@@ -232,6 +233,7 @@ class ProfileFragment : Fragment() {
                     PreferenceData.getInstance().putTimeSharing(requireContext(), true)
                     PreferenceData.getInstance().putSharing(requireContext(), isInTimeRange)
                 } else {
+                    cancelGeofenceWorker()
                     bnd.locationSwitch.isEnabled = true
                     PreferenceData.getInstance().putTimeSharing(requireContext(), false)
                 }
@@ -330,12 +332,12 @@ class ProfileFragment : Fragment() {
                 )
             }
 
-
         geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
             addOnSuccessListener {
                 viewModel.updateGeofence(location.latitude, location.longitude, 100.0)
                 runWorker()
             }
+
             addOnFailureListener {
                 it.printStackTrace()
                 binding.locationSwitch.isChecked = false
@@ -372,21 +374,55 @@ class ProfileFragment : Fragment() {
         )
     }
 
+    private fun runGeofenceWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val repeatingRequest = PeriodicWorkRequestBuilder<GeofenceWorker>(
+            15, TimeUnit.MINUTES,
+            5, TimeUnit.MINUTES
+        )
+            .setConstraints(constraints)
+            .addTag("geofenceworker-tag")
+            .build()
+
+        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+            "geofenceworker",
+            ExistingPeriodicWorkPolicy.KEEP, // or REPLACE
+            repeatingRequest
+        )
+
+        WorkManager.getInstance(requireContext())
+            .getWorkInfoByIdLiveData(repeatingRequest.id)
+            .observe(viewLifecycleOwner) { workInfo ->
+                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    turnOnSharing()
+                } else {
+                    turnOffSharing()
+                }
+            }
+    }
+
     private fun cancelWorker() {
         WorkManager.getInstance(requireContext()).cancelUniqueWork("myworker")
     }
 
-    private fun isWithinTimeRange(): Boolean {
-        val currentTime = Calendar.getInstance().time
-        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val formattedTime = dateFormat.format(currentTime)
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val currentTimeDate = sdf.parse(formattedTime)
-        val startTimeDate = sdf.parse("10:00")
-        val endTimeDate = sdf.parse("17:00")
-
-        return currentTimeDate in startTimeDate..endTimeDate
+    private fun cancelGeofenceWorker() {
+        WorkManager.getInstance(requireContext()).cancelUniqueWork("geofenceworker")
     }
+
+//    private fun isWithinTimeRange(): Boolean {
+//        val currentTime = Calendar.getInstance().time
+//        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+//        val formattedTime = dateFormat.format(currentTime)
+//        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+//        val currentTimeDate = sdf.parse(formattedTime)
+//        val startTimeDate = sdf.parse("10:00")
+//        val endTimeDate = sdf.parse("17:00")
+//
+//        return currentTimeDate in startTimeDate..endTimeDate
+//    }
 
     private fun onCameraTrackingDismissed() {
         mapView.location

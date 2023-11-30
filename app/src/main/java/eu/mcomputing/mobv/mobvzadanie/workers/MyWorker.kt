@@ -19,9 +19,7 @@ class MyWorker(appContext: Context, workerParams: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         // Tu môžete vykonávať asynchrónnu prácu
-        Log.d("MyWorker", "worker's running")
         DataRepository.getInstance(applicationContext).apiListGeofence()
-
         createNotification(applicationContext)
 
         return Result.success()
