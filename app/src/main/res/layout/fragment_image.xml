@@ -28,14 +28,18 @@
             android:id="@+id/chooseImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="#fff"
             android:fontFamily="sans-serif-condensed"
             android:minWidth="150dp"
             android:text="@string/choose_image"
             android:textAllCaps="true"
+            android:textColor="#123"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/profileImageView"
+            app:strokeColor="#123"
+            app:strokeWidth="2dp" />
 
         <TextView
             android:id="@+id/deleteImageButton"

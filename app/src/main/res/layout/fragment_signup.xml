@@ -172,14 +172,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:backgroundTint="#fff"
             android:fontFamily="sans-serif-condensed"
             android:minWidth="150dp"
             android:text="@string/back"
             android:textAllCaps="true"
+            android:textColor="#123"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/submit_button" />
+            app:layout_constraintStart_toEndOf="@+id/submit_button"
+            app:strokeColor="#123"
+            app:strokeWidth="2dp" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

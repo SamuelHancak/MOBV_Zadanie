@@ -36,7 +36,7 @@
             android:text="@string/location_desc"
             android:textAlignment="center"
             android:textAllCaps="true"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="#889099"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
