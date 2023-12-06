@@ -33,9 +33,9 @@ class MyWorker(appContext: Context, workerParams: WorkerParameters) :
         val descriptionText = "There are ${users.size} users in near area"
         val text = users.joinToString { it.name }
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel_id = "kanal-1"
+        val channelId = "kanal-1"
         val channel =
-            NotificationChannel(channel_id, name, importance).apply {
+            NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
             }
         // Register the channel with the system
@@ -44,7 +44,7 @@ class MyWorker(appContext: Context, workerParams: WorkerParameters) :
         notificationManager.createNotificationChannel(channel)
 
         val builder =
-            NotificationCompat.Builder(context, channel_id).apply {
+            NotificationCompat.Builder(context, channelId).apply {
                 setContentTitle(descriptionText)
                 setContentText(text)
                 setSmallIcon(R.mipmap.ic_launcher_round)

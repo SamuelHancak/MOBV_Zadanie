@@ -60,6 +60,7 @@ class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private lateinit var annotationManager: CircleAnnotationManager
     private var lastLocation: Point? = null
+    private var lastZoom: Double = 0.0
 
     private val PERMISSIONS_REQUIRED = when {
         Build.VERSION.SDK_INT >= 33 -> { // android 13
@@ -104,19 +105,27 @@ class ProfileFragment : Fragment() {
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        if (lastLocation == null || lastLocation != it) {
-            lastLocation = it
-            mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(14.0).build())
-            mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
+        if (lastZoom == 0.0 || lastZoom != mapView.getMapboxMap().cameraState.zoom) {
+            lastZoom = mapView.getMapboxMap().cameraState.zoom
             annotationManager.deleteAll()
+            val metersPerPixel =
+                mapView.getMapboxMap().getMetersPerPixelAtLatitude(it.latitude(), lastZoom)
+            val circleRadiusInMeters = 100.0 / metersPerPixel
+
             val pointAnnotationOptions = CircleAnnotationOptions()
                 .withPoint(it)
-                .withCircleRadius(100.0)
+                .withCircleRadius(circleRadiusInMeters)
                 .withCircleOpacity(0.2)
                 .withCircleColor("#000")
                 .withCircleStrokeWidth(2.0)
                 .withCircleStrokeColor("#fff")
             annotationManager.create(pointAnnotationOptions)
+        }
+
+        if (lastLocation == null || lastLocation != it) {
+            lastLocation = it
+            mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).zoom(14.0).build())
+            mapView.gestures.focalPoint = mapView.getMapboxMap().pixelForCoordinate(it)
         }
     }
 
