@@ -63,6 +63,7 @@ class MapFragment : Fragment() {
     private var users: List<UserEntity>? = null
     private lateinit var mapView: MapView
     private var lastZoom: Double = 0.0
+    private var lastRadius: Double = 0.0
 
     private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -80,15 +81,12 @@ class MapFragment : Fragment() {
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        Log.d("MapFragment", mapView.getMapboxMap().cameraState.zoom.toString())
-        Log.d("MapFragment", lastZoom.toString())
         if (lastZoom == 0.0 || lastZoom != mapView.getMapboxMap().cameraState.zoom) {
             lastZoom = mapView.getMapboxMap().cameraState.zoom
             annotationManager.deleteAll()
             val metersPerPixel =
                 mapView.getMapboxMap().getMetersPerPixelAtLatitude(it.latitude(), lastZoom)
-            val circleRadiusInMeters = 100.0 / metersPerPixel
-            Log.d("MapFragment", "circleRadiusInMeters: $circleRadiusInMeters")
+            val circleRadiusInMeters = lastRadius / metersPerPixel
 
             val pointAnnotationOptions = CircleAnnotationOptions()
                 .withPoint(it)
@@ -202,6 +200,11 @@ class MapFragment : Fragment() {
     }
 
     private fun onMapReady(enabled: Boolean) {
+        DataRepository.getInstance(requireContext()).getGeofence().observe(viewLifecycleOwner) {
+            if (it != null) {
+                lastRadius = it.radius
+            }
+        }
         binding.mapView.getMapboxMap().setCamera(
             CameraOptions.Builder().build()
         )

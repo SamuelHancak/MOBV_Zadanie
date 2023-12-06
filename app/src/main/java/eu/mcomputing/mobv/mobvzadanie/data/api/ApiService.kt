@@ -48,11 +48,6 @@ interface ApiService {
     ): Response<UserResponse>
 
     @POST("user/refresh.php")
-    suspend fun refreshToken(
-        @Body refreshInfo: RefreshTokenRequest
-    ): Response<RefreshTokenResponse>
-
-    @POST("user/refresh.php")
     fun refreshTokenBlocking(
         @Body refreshInfo: RefreshTokenRequest
     ): Call<RefreshTokenResponse>

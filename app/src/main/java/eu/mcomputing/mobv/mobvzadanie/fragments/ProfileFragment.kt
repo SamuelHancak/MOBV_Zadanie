@@ -61,6 +61,7 @@ class ProfileFragment : Fragment() {
     private lateinit var annotationManager: CircleAnnotationManager
     private var lastLocation: Point? = null
     private var lastZoom: Double = 0.0
+    private var lastRadius: Double = 0.0
 
     private val PERMISSIONS_REQUIRED = when {
         Build.VERSION.SDK_INT >= 33 -> { // android 13
@@ -193,6 +194,7 @@ class ProfileFragment : Fragment() {
             bnd.logoutBtn.setOnClickListener {
                 PreferenceData.getInstance().clearData(requireContext())
                 PreferenceData.getInstance().clearUser(requireContext())
+                viewModel.logoutUser()
                 it.findNavController().navigate(R.id.action_to_intro)
             }
 
@@ -251,6 +253,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun onMapReady() {
+        DataRepository.getInstance(requireContext()).getGeofence().observe(viewLifecycleOwner) {
+            if (it != null) {
+                lastRadius = it.radius
+            }
+        }
         mapView.getMapboxMap().setCamera(
             CameraOptions.Builder()
                 .zoom(14.0)
@@ -353,7 +360,6 @@ class ProfileFragment : Fragment() {
                 PreferenceData.getInstance().putSharing(requireContext(), false)
             }
         }
-
     }
 
     private fun removeGeofence() {
@@ -378,7 +384,7 @@ class ProfileFragment : Fragment() {
 
         WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
             "myworker",
-            ExistingPeriodicWorkPolicy.KEEP, // or REPLACE
+            ExistingPeriodicWorkPolicy.KEEP,
             repeatingRequest
         )
     }
@@ -398,7 +404,7 @@ class ProfileFragment : Fragment() {
 
         WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
             "geofenceworker",
-            ExistingPeriodicWorkPolicy.KEEP, // or REPLACE
+            ExistingPeriodicWorkPolicy.KEEP,
             repeatingRequest
         )
 
@@ -420,18 +426,6 @@ class ProfileFragment : Fragment() {
     private fun cancelGeofenceWorker() {
         WorkManager.getInstance(requireContext()).cancelUniqueWork("geofenceworker")
     }
-
-//    private fun isWithinTimeRange(): Boolean {
-//        val currentTime = Calendar.getInstance().time
-//        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-//        val formattedTime = dateFormat.format(currentTime)
-//        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-//        val currentTimeDate = sdf.parse(formattedTime)
-//        val startTimeDate = sdf.parse("10:00")
-//        val endTimeDate = sdf.parse("17:00")
-//
-//        return currentTimeDate in startTimeDate..endTimeDate
-//    }
 
     private fun onCameraTrackingDismissed() {
         mapView.location

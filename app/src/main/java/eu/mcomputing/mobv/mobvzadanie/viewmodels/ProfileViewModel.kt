@@ -36,4 +36,10 @@ class ProfileViewModel(private val dataRepository: DataRepository) : ViewModel()
             dataRepository.removeGeofence()
         }
     }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            dataRepository.logoutUser()
+        }
+    }
 }

@@ -49,7 +49,7 @@ class FeedFragment : Fragment() {
             val feedAdapter = FeedAdapter()
             bnd.feedRecyclerview.adapter = feedAdapter
 
-            viewModel.feed_items.observe(viewLifecycleOwner) { items ->
+            viewModel.feedItems.observe(viewLifecycleOwner) { items ->
                 feedAdapter.updateItems(items ?: emptyList())
             }
 
@@ -61,7 +61,7 @@ class FeedFragment : Fragment() {
                 bnd.pullRefresh.isRefreshing = it
             }
 
-            viewModel.feed_items.observe(viewLifecycleOwner) { newItems ->
+            viewModel.feedItems.observe(viewLifecycleOwner) { newItems ->
                 if (newItems != null) {
                     feedAdapter.updateItems(newItems)
                 }

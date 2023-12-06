@@ -9,6 +9,7 @@ import eu.mcomputing.mobv.mobvzadanie.data.api.model.GeofenceUpdateRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.UserLoginRequest
 import eu.mcomputing.mobv.mobvzadanie.data.api.model.UserRegistrationRequest
 import eu.mcomputing.mobv.mobvzadanie.data.db.AppRoomDatabase
+import eu.mcomputing.mobv.mobvzadanie.data.db.LocalCache
 import eu.mcomputing.mobv.mobvzadanie.data.db.entities.GeofenceEntity
 import eu.mcomputing.mobv.mobvzadanie.data.db.entities.UserEntity
 import eu.mcomputing.mobv.mobvzadanie.data.model.User
@@ -17,7 +18,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import venaka.bioapp.data.db.LocalCache
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
@@ -27,8 +27,6 @@ class DataRepository private constructor(
     private val cache: LocalCache
 ) {
     companion object {
-        const val TAG = "DataRepository"
-
         @Volatile
         private var INSTANCE: DataRepository? = null
         private val lock = Any()
@@ -274,6 +272,8 @@ class DataRepository private constructor(
 
     fun getUsers() = cache.getUsers()
 
+    fun getGeofence() = cache.getUserGeofence()
+
     suspend fun getUsersList() = cache.getUsersList()
 
     suspend fun insertGeofence(item: GeofenceEntity) {
@@ -317,6 +317,10 @@ class DataRepository private constructor(
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
+    }
+
+    suspend fun logoutUser() {
+        cache.logoutUser()
     }
 
     suspend fun removeImage(): String {

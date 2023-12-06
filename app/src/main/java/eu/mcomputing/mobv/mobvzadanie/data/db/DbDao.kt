@@ -17,6 +17,9 @@ interface DbDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserItems(items: List<UserEntity>)
 
+    @Query("select * from geofence")
+    fun getUserGeofence(): LiveData<GeofenceEntity?>
+
     @Query("select * from users where uid=:uid")
     fun getUserItem(uid: String): LiveData<UserEntity?>
 

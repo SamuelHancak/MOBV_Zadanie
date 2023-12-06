@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class FeedViewModel(private val repository: DataRepository) : ViewModel() {
 
-    val feed_items: LiveData<List<UserEntity>?> =
+    val feedItems: LiveData<List<UserEntity>?> =
         liveData {
             loading.postValue(true)
             repository.apiListGeofence()
